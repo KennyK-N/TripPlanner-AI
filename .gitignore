@@ -166,4 +166,6 @@ node_modules
 prisma/*
 !prisma/schema.prisma
 
+# Delete later 
 PROJECT_DEL_LATER/
+FlexTesting.jsx

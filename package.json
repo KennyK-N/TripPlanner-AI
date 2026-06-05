@@ -32,6 +32,7 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "axios": "^1.16.1",
     "better-auth": "^1.6.11",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

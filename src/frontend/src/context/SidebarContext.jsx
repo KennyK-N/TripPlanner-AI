@@ -1,17 +1,17 @@
 import { useContext, useState, createContext } from "react";
 
-const SidebarContext = createContext();
+const sideBarContext = createContext();
 
 export function UseSidebarContext() {
-  const context = useContext(SidebarContext);
+  const context = useContext(sideBarContext);
 
   if (!context) {
-    throw new Error("useSidebarContext must be used within SidebarProvider");
+    throw new Error("useSidebarContext must be used within sideBarProvider");
   }
 
   return context;
 }
-export function SidebarProvider({ children }) {
+export function SideBarProvider({ children }) {
   const [expanded, setExpanded] = useState(true);
 
   function toggleSidebar() {
@@ -23,8 +23,8 @@ export function SidebarProvider({ children }) {
   }
 
   return (
-    <SidebarContext.Provider value={{ expanded, toggleSidebar, closeSidebar }}>
+    <sideBarContext.Provider value={{ expanded, toggleSidebar, closeSidebar }}>
       {children}
-    </SidebarContext.Provider>
+    </sideBarContext.Provider>
   );
 }

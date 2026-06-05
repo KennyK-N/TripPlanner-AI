@@ -71,7 +71,19 @@ model Verification {
   @@map("verification")
 }
 
-model data {
-  id String @id
-  value String
+model Task{
+  /* 
+  id (task)
+  user id is foregin key with relation
+  rest of description goes down here
+  */
+
+  @@map("task")
 }
+
+model Setting{
+
+  // user id is foregin key with relation
+  @@map("setting")
+}
+
