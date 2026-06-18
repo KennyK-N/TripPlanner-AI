@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useInfiniteScrolling from "@hooks/useInfiniteScroll";
 import fetchDataMain from "@/services/fetchDataMain";
 
@@ -9,13 +9,15 @@ export default function Home() {
     type: "None",
     value: "",
   });
-
+  const [isStopFetch, setIsStopFetch] = useState(false);
   function fetchDataOuter(page) {
-    fetchDataMain(page, setItems, setLoading, setAlertValue);
+    fetchDataMain(page, setItems, setLoading, setAlertValue, setIsStopFetch);
   }
-  // use usecallback for effiency but then we will need to move observerTarget outside useInfiniteScrolling scope
-  const { observerTarget } = useInfiniteScrolling(fetchDataOuter);
 
+  const { observerTarget, page } = useInfiniteScrolling(
+    fetchDataOuter,
+    loading,
+  );
   const Items = items.map((item, index) => {
     return (
       <div
@@ -35,10 +37,14 @@ export default function Home() {
   return (
     <>
       <div className="grid md:grid-cols-[repeat(auto-fit,minmax(600px,1fr))] grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6">
-        {/*children */}
         {Items}
       </div>
-      <div ref={observerTarget} className="observerTarget"></div>
+      {!isStopFetch && (
+        <div
+          ref={observerTarget}
+          className="observerTarget h-20 w-full col-span-full"
+        ></div>
+      )}
       {loading && <h1>test</h1>}
     </>
   );

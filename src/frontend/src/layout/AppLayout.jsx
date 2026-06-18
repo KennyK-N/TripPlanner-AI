@@ -5,7 +5,7 @@ import SideBarLayout from "@layout/SideBarLayout";
 
 export default function AppLayout({ children }) {
   return (
-    <div className="min-h-screen flex">
+    <div className="h-screen flex overflow-hidden">
       <SideBarProvider>
         <Alert></Alert>
         <SideBarLayout></SideBarLayout>
@@ -13,7 +13,7 @@ export default function AppLayout({ children }) {
           <Header />
           {/*TODO: Make this part mobile responsive later*/}
           {/*Display container */}
-          <main className="p-10  ml-15 sm:ml-20 lg:ml-22 mt-[5em]">
+          <main className="h-full p-10 ml-15 sm:ml-20 lg:ml-22 mt-[5em]">
             {children}
           </main>
         </div>

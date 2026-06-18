@@ -48,7 +48,7 @@ export default function Alert({ alertType }) {
     <>
       <div
         ref={boxRef}
-        className={`fixed right-0 bottom-10 block transform transition-all duration-150 ease-out ${
+        className={`fixed right-0 bottom-10 block transform transition-all duration-150 ease-out z-[9999] ${
           mounted ? "scale-100" : "scale-0"
         }`}
       >

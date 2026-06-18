@@ -191,7 +191,7 @@ export default function BasicTableOne() {
       <div className="max-w-full overflow-x-auto">
         <Table>
           {/* Table Header */}
-          <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+          {/* <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
               <TableCell
                 isHeader
@@ -224,7 +224,7 @@ export default function BasicTableOne() {
                 Budget
               </TableCell>
             </TableRow>
-          </TableHeader>
+          </TableHeader> */}
 
           {/* Table Body */}
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">

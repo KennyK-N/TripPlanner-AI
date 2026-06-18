@@ -1,34 +1,40 @@
 import { useEffect, useRef, useState } from "react";
 
-const useInfiniteScrolling = (fetchData) => {
-  const [page, setPage] = useState(0);
+export default function useInfiniteScrolling(fetchData, loading) {
   const observerTarget = useRef(null);
-  //maybe use a callback function for effiency
+  const [page, setPage] = useState(0);
+
+  function fetchNextPage() {
+    if (loading) return;
+
+    setPage((prevPage) => {
+      const nextPage = prevPage + 1;
+      fetchData(nextPage);
+      return nextPage;
+    });
+  }
+
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setPage((prevPage) => {
-            const nextPage = prevPage + 1;
-            fetchData(nextPage);
-            return nextPage;
-          });
-        }
-      },
-      { threshold: 1 },
-    );
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !loading) {
+        fetchNextPage();
+      }
+    });
+
+    const target = observerTarget.current;
+
+    if (target) {
+      observer.observe(target);
     }
+
     return () => {
-      if (observerTarget.current) {
-        observer.unobserve(observerTarget.current);
+      if (target) {
+        observer.unobserve(target);
       }
     };
-  }, [observerTarget]);
+  }, [loading, observerTarget]);
   return {
     observerTarget,
+    page,
   };
-};
-
-export default useInfiniteScrolling;
+}
