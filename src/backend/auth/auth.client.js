@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth";
-import { betterAuthConfig } from "../config/betterAuth.js";
+import { betterAuthConfig } from "#backend/auth/auth.config.js";
 
 export const auth = betterAuth(betterAuthConfig);
 

@@ -1,135 +1,37 @@
-import dotenv from "dotenv";
+import config from "#backend/config/index.js";
 import cookieParser from "cookie-parser";
 import express from "express";
-import cors from "cors";
-import { prisma } from "#backend/services/prisma-client.js";
+import securityMiddleware from "#backend/middleware/security.middleware.js";
+import loggerMiddleware from "#backend/middleware/logger.middleware.js";
+import errorHandlerMiddleware from "#backend/middleware/errorHandler.middleware.js";
+import Router from "#backend/routes/index.js";
+import data from "#backend/data/data.json" with { type: "json" };
+import { betterAuthRouter } from "#backend/routes/auth-routes.js";
+
+console.log(data);
 
 const app = express();
 
-app.use(
-  cors({
-    origin: ["http://localhost:5000/"], // Replace with frontend's origin
-    methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
-    credentials: true,
-  }),
-);
-
+app.use(loggerMiddleware);
+app.use(securityMiddleware);
 app.use(cookieParser());
 
-// (async () => {
-//   const users = await prisma.user.findMany();
-//   console.log(users);
-// })();
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true }));
 
-// app.get("/users", async (req, res) => {
-//   try {
-//     const users = await prisma.user.findMany();
-//     res.json(users);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).json({ error: err.message });
-//   }
-// });
+// Mount all routes in here
+app.use(betterAuthRouter);
+//mount to v1 later
+app.use("/api", Router);
+app.use(Router);
 
-import { auth } from "#backend/services/auth.js";
-import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
+// Error handler middleware has to be last
+app.use(errorHandlerMiddleware);
 
-console.log(process.env.AUTH_SECRET);
-console.log(process.env.BETTER_AUTH_URL);
-
-app.use(express.json());
-
-app.get("/me", async (req, res) => {
-  try {
-    console.log(req.cookies["better-auth.session_token"]);
-    const session = await auth.api.getSession({
-      headers: fromNodeHeaders(req.headers),
-    });
-
-    res.json(session);
-  } catch (err) {
-    console.error("SESSION ERROR:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post("/test-signup", async (req, res) => {
-  try {
-    const data = await auth.api.signUpEmail({
-      body: {
-        name: "John Doe",
-        email: "john.doe@example.com",
-        password: "password1234",
-        image: "https://example.com/image.png",
-        callbackURL: "http://localhost:5000/api/auth/ok",
-      },
-    });
-
-    res.json(data);
-  } catch (err) {
-    console.error("SIGNUP ERROR:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post("/test-login", async (req, res) => {
-  try {
-    if (req.cookies["better-auth.session_token"]) {
-      return res.json({
-        AlreadyLogin: true,
-      });
-    }
-
-    const data = await auth.api.signInEmail({
-      headers: fromNodeHeaders(req.headers),
-      returnHeaders: true,
-      body: {
-        email: "john.doe@example.com",
-        password: "password1234",
-      },
-    });
-
-    var cookie = data.headers.get("set-cookie");
-    console.log(cookie);
-
-    if (cookie) {
-      res.setHeader("set-cookie", cookie);
-    }
-
-    res.json(data.response);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.post("/test-sign-out", async (req, res) => {
-  try {
-    const data = await auth.api.signOut({
-      returnHeaders: true,
-      headers: fromNodeHeaders(req.headers),
-    });
-
-    var cookie = data.headers.get("set-cookie");
-
-    console.log(cookie);
-
-    if (cookie) {
-      res.setHeader("set-cookie", cookie);
-    }
-
-    return res.json({
-      success: true,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      error: err.message,
-    });
-  }
-});
-
-app.listen(5000, () => {
-  console.log(`Server running on port 5000 with ${process.env.NODE_ENV}`);
+app.listen(config["BACK_END_PORT"], () => {
+  console.log(
+    `Server running on port ${config["BACK_END_PORT"]} with ${process.env.NODE_ENV}`,
+  );
 });
 
 // TODO: WILL NEED TO HANDLE STALE LOGIN, i.E IF NOT IN the SESSION DB TABLE CLEAR THE COOKIE CUZ ITS STALE

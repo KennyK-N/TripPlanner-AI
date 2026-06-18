@@ -23,13 +23,15 @@ model User {
 
   sessions Session[]
   accounts Account[]
+  tasks    Task[]
+  setting  Setting?
 
   @@map("user")
 }
 
 model Session {
   id        String   @id
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   token     String   @unique
   expiresAt DateTime @db.Timestamptz(3)
@@ -43,7 +45,7 @@ model Session {
 
 model Account {
   id                    String    @id
-  user                  User      @relation(fields: [userId], references: [id])
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                String
   accountId             String
   providerId            String
@@ -71,19 +73,37 @@ model Verification {
   @@map("verification")
 }
 
-model Task{
-  /* 
-  id (task)
-  user id is foregin key with relation
-  rest of description goes down here
-  */
+model Task {
+  id          String   @id @default(cuid())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  projectName String
+  startDate   DateTime @db.Timestamptz(3)
+  endDate     DateTime @db.Timestamptz(3)
+  data        Json
+
+  weather Weather?
 
   @@map("task")
 }
 
-model Setting{
+model Setting {
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  emailNotification Boolean
+  confirmDelete     Boolean
+  darkMode          Boolean
 
-  // user id is foregin key with relation
+  @@id([userId])
   @@map("setting")
 }
 
+model Weather {
+  task          Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId        String
+  temp          String
+  precipitation String
+
+  @@id([taskId])
+  @@map("weather")
+}
